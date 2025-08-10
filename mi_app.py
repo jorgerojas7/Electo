@@ -22,30 +22,19 @@ st.set_page_config(
     page_title="App de Reportes - Perrini",
     page_icon="📊",
     layout="wide", # Usamos wide para el contenido principal
-    # --- ¡CAMBIO CLAVE AQUÍ! Eliminamos initial_sidebar_state="expanded" ---
-    # Esto asegura que la barra lateral comience colapsada,
-    # y que el botón de hamburguesa siempre sea visible para expandirla.
+    initial_sidebar_state="collapsed" # <-- ¡CAMBIO CLAVE! Inicia COLAPSADO por defecto
 )
 
-# --- CSS para OCULTAR elementos por defecto de Streamlit (más ligero) ---
+# --- CSS para OCULTAR elementos por defecto de Streamlit (MÁS LIGERO Y SEGURO) ---
 hide_elements_css = """
     <style>
-        /* Dejamos el MainMenu (hamburguesa) visible para expandir/colapsar el sidebar */
-        /* #MainMenu {visibility: hidden;} */
+        /* El botón de hamburguesa (#MainMenu) se deja visible para que Streamlit lo muestre y oculte el sidebar */
+        /* No se usa visibility: hidden; para #MainMenu aquí */
         footer {visibility: hidden;} /* Oculta el footer "Made with Streamlit" */
         header {visibility: hidden;} /* Oculta el encabezado de Streamlit */
 
-        /* --- ¡CAMBIO CLAVE AQUÍ! Eliminamos las reglas agresivas para stSidebar --- */
-        /* Dejamos que Streamlit maneje la visibilidad y transformación de [data-testid="stSidebar"] */
-        /*
-        [data-testid="stSidebar"] {
-            visibility: visible !important;
-            display: flex !important;
-            transform: none !important;
-            width: 210px !important;
-            max-width: 210px !important;
-        }
-        */
+        /* Eliminamos cualquier CSS que force o restrinja el sidebar, Streamlit lo manejará */
+        /* [data-testid="stSidebar"] se deja a Streamlit para su comportamiento nativo */
     </style>
 """
 st.markdown(hide_elements_css, unsafe_allow_html=True)
@@ -69,11 +58,10 @@ def display_welcome_message():
 
 
 # --- Renderizado del Contenido del Reporte Seleccionado ---
-st.markdown("---") # Separador visual
+st.markdown("---")
 
-# Añadimos la condición para la página de bienvenida.
 if st.session_state.selected_report_file == "welcome_page":
-    display_welcome_message() # Muestra el mensaje de bienvenida
+    display_welcome_message()
 elif st.session_state.selected_report_file:
     # Ruta a la carpeta de contenido de reportes (¡Importante!)
     report_content_dir = "report_content" 
@@ -83,18 +71,13 @@ elif st.session_state.selected_report_file:
         sys.path.append(report_content_dir)
 
     try:
-        # Extraer el nombre del módulo (sin .py)
         module_name = st.session_state.selected_report_file.replace(".py", "")
-        
-        # Cargar el módulo dinámicamente
-        # Usamos importlib.util para un control más fino y para evitar problemas con la caché.
         spec = importlib.util.spec_from_file_location(module_name, os.path.join(report_content_dir, st.session_state.selected_report_file))
         if spec and spec.loader:
             report_module = importlib.util.module_from_spec(spec)
-            sys.modules[module_name] = report_module # Añadir al sys.modules para que pueda ser importado
+            sys.modules[module_name] = report_module
             spec.loader.exec_module(report_module)
 
-            # Verificar si el módulo tiene la función 'render_content' y llamarla
             if hasattr(report_module, 'render_content') and callable(report_module.render_content):
                 report_module.render_content()
             else:
@@ -111,7 +94,6 @@ elif st.session_state.selected_report_file:
         st.warning("Asegúrate de que no haya errores de sintaxis en el archivo del reporte.")
 
 else:
-    # Esto se mostrará si st.session_state.selected_report_file es None (después de "Salir")
     st.info("Por favor, selecciona un reporte para empezar.")
     st.image("https://placehold.co/800x400/cccccc/000000?text=Bienvenido", caption="Tu aplicación está lista.")
 
