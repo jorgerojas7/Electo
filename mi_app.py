@@ -22,19 +22,19 @@ st.set_page_config(
     page_title="App de Reportes - Perrini",
     page_icon="📊",
     layout="wide", # Usamos wide para el contenido principal
-    initial_sidebar_state="collapsed" # <-- ¡CAMBIO CLAVE! Inicia COLAPSADO por defecto
+    initial_sidebar_state="expanded" # <-- ¡CAMBIO CLAVE! Ahora inicia EXPANDIDO
 )
 
 # --- CSS para OCULTAR elementos por defecto de Streamlit (MÁS LIGERO Y SEGURO) ---
+# Hemos eliminado todas las reglas CSS que intentaban manipular el sidebar o el MainMenu
+# para dejar que Streamlit los maneje de forma nativa.
 hide_elements_css = """
     <style>
-        /* El botón de hamburguesa (#MainMenu) se deja visible para que Streamlit lo muestre y oculte el sidebar */
-        /* No se usa visibility: hidden; para #MainMenu aquí */
         footer {visibility: hidden;} /* Oculta el footer "Made with Streamlit" */
         header {visibility: hidden;} /* Oculta el encabezado de Streamlit */
 
-        /* Eliminamos cualquier CSS que force o restrinja el sidebar, Streamlit lo manejará */
-        /* [data-testid="stSidebar"] se deja a Streamlit para su comportamiento nativo */
+        /* No hay reglas CSS aquí para #MainMenu o [data-testid="stSidebar"]
+           para asegurar que Streamlit los maneje nativamente y muestre el sidebar. */
     </style>
 """
 st.markdown(hide_elements_css, unsafe_allow_html=True)
