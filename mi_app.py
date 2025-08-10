@@ -33,10 +33,10 @@ st.set_page_config(
 )
 
 # --- CSS para OCULTAR elementos por defecto de Streamlit ---
-# Solo ocultamos el MainMenu, footer y header, no el sidebar en general.
+# NOTA: Se ha quitado la ocultación de #MainMenu para permitir que la hamburguesa aparezca al colapsar.
 hide_elements_css = """
     <style>
-        #MainMenu {visibility: hidden;} /* Oculta el menú de hamburguesa de Streamlit */
+        /* #MainMenu {visibility: hidden;} */ /* ¡Esta línea ha sido eliminada o comentada! */
         footer {visibility: hidden;} /* Oculta el footer "Made with Streamlit" */
         header {visibility: hidden;} /* Oculta el encabezado de Streamlit */
     </style>
