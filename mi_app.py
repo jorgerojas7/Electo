@@ -22,19 +22,19 @@ st.set_page_config(
     page_title="App de Reportes - Perrini",
     page_icon="📊",
     layout="wide", # Usamos wide para el contenido principal
-    initial_sidebar_state="expanded" # <-- ¡CAMBIO CLAVE! Ahora inicia EXPANDIDO
+    initial_sidebar_state="collapsed" # <-- ¡CAMBIO CLAVE! Inicia COLAPSADO por defecto
 )
 
 # --- CSS para OCULTAR elementos por defecto de Streamlit (MÁS LIGERO Y SEGURO) ---
-# Hemos eliminado todas las reglas CSS que intentaban manipular el sidebar o el MainMenu
-# para dejar que Streamlit los maneje de forma nativa.
+# Hemos eliminado TODAS las reglas CSS que intentaban manipular el sidebar o el MainMenu
+# para dejar que Streamlit los maneje de forma nativa y fiable.
 hide_elements_css = """
     <style>
         footer {visibility: hidden;} /* Oculta el footer "Made with Streamlit" */
         header {visibility: hidden;} /* Oculta el encabezado de Streamlit */
 
         /* No hay reglas CSS aquí para #MainMenu o [data-testid="stSidebar"]
-           para asegurar que Streamlit los maneje nativamente y muestre el sidebar. */
+           Dejamos que Streamlit los controle completamente de forma nativa. */
     </style>
 """
 st.markdown(hide_elements_css, unsafe_allow_html=True)
@@ -96,4 +96,3 @@ elif st.session_state.selected_report_file:
 else:
     st.info("Por favor, selecciona un reporte para empezar.")
     st.image("https://placehold.co/800x400/cccccc/000000?text=Bienvenido", caption="Tu aplicación está lista.")
-
