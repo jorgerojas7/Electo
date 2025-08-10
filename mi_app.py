@@ -12,15 +12,9 @@ init_reports_data()
 
 # --- Configuración Inicial del Estado de Sesión ---
 # Define el archivo del reporte seleccionado para mostrar su contenido.
+# ¡CAMBIO AQUÍ! Inicializamos con 'welcome_page' para mostrar el mensaje de bienvenida.
 if 'selected_report_file' not in st.session_state:
-    config = get_all_reports_config()
-    # Establece el primer reporte del JSON como predeterminado al inicio
-    first_report_filename = None
-    if config and config.get("groups"):
-        if config["groups"][0].get("reports"):
-            first_report_filename = config["groups"][0]["reports"][0].get("filename")
-    
-    st.session_state.selected_report_file = first_report_filename or "Reporte_1.py" # Fallback
+    st.session_state.selected_report_file = "welcome_page"
 
 
 # --- Configuración de la Página Global ---
@@ -33,7 +27,7 @@ st.set_page_config(
 )
 
 # --- CSS para OCULTAR elementos por defecto de Streamlit ---
-# NOTA: Se ha quitado la ocultación de #MainMenu para permitir que la hamburguesa aparezca al colapsar.
+# Solo ocultamos el MainMenu, footer y header, no el sidebar en general.
 hide_elements_css = """
     <style>
         /* #MainMenu {visibility: hidden;} */ /* ¡Esta línea ha sido eliminada o comentada! */
@@ -50,10 +44,24 @@ st.markdown(hide_elements_css, unsafe_allow_html=True)
 build_collapsible_sidebar_menu()
 
 
+# --- Función para Mostrar el Mensaje de Bienvenida ---
+def display_welcome_message():
+    st.title("👋 ¡Bienvenido a tu App de Reportes, Perrini!")
+    st.write("Esta es tu plataforma centralizada para explorar todos tus análisis de datos.")
+    st.markdown("---")
+    st.info("Para comenzar, por favor, selecciona un reporte de la **lista en el menú lateral de la izquierda**.")
+    st.write("Puedes navegar entre diferentes grupos y reportes, y el contenido se cargará aquí mismo.")
+    st.image("https://placehold.co/800x400/80C0D0/FFFFFF?text=Selecciona+un+Reporte",
+             caption="Tu información está a solo un clic de distancia.")
+
+
 # --- Renderizado del Contenido del Reporte Seleccionado ---
 st.markdown("---") # Separador visual
 
-if st.session_state.selected_report_file:
+# ¡CAMBIO AQUÍ! Añadimos la condición para la página de bienvenida.
+if st.session_state.selected_report_file == "welcome_page":
+    display_welcome_message() # Muestra el mensaje de bienvenida
+elif st.session_state.selected_report_file:
     # Ruta a la carpeta de contenido de reportes (¡Importante!)
     report_content_dir = "report_content" 
 
@@ -83,14 +91,13 @@ if st.session_state.selected_report_file:
             st.warning(f"Asegúrate de que el archivo '{st.session_state.selected_report_file}' existe en la carpeta '{report_content_dir}/'.")
 
     except FileNotFoundError:
-        st.error(f"Error: El archivo de reporte '{st.session_state.selected_report_file}' no fue encontrado en '{report_content_dir}/'.")
+        st.error(f"Error: El archivo de reporte '{st.session_report_file}' no fue encontrado en '{report_content_dir}/'.")
         st.warning("Verifica que el nombre del archivo en 'reports_config.json' coincide con el nombre real en la carpeta 'report_content/'.")
     except Exception as e:
         st.error(f"Ocurrió un error al cargar o renderizar el reporte: {e}")
         st.warning("Asegúrate de que no haya errores de sintaxis en el archivo del reporte.")
 
 else:
-    # Esto se mostrará si st.session_state.selected_report_file es None (por ejemplo, después de "Salir")
-    st.info("Selecciona un reporte del menú lateral.")
+    # Esto se mostrará si st.session_state.selected_report_file es None (después de "Salir")
+    st.info("Por favor, selecciona un reporte para empezar.")
     st.image("https://placehold.co/800x400/cccccc/000000?text=Bienvenido", caption="Tu aplicación está lista.")
-
