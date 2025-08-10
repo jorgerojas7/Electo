@@ -12,7 +12,6 @@ init_reports_data()
 
 # --- Configuración Inicial del Estado de Sesión ---
 # Define el archivo del reporte seleccionado para mostrar su contenido.
-# ¡CAMBIO AQUÍ! Inicializamos con 'welcome_page' para mostrar el mensaje de bienvenida.
 if 'selected_report_file' not in st.session_state:
     st.session_state.selected_report_file = "welcome_page"
 
@@ -23,16 +22,30 @@ st.set_page_config(
     page_title="App de Reportes - Perrini",
     page_icon="📊",
     layout="wide", # Usamos wide para el contenido principal
-    initial_sidebar_state="expanded" # Queremos el sidebar expandido por defecto
+    # --- ¡CAMBIO CLAVE AQUÍ! Eliminamos initial_sidebar_state="expanded" ---
+    # Esto asegura que la barra lateral comience colapsada,
+    # y que el botón de hamburguesa siempre sea visible para expandirla.
 )
 
-# --- CSS para OCULTAR elementos por defecto de Streamlit ---
-# Solo ocultamos el MainMenu, footer y header, no el sidebar en general.
+# --- CSS para OCULTAR elementos por defecto de Streamlit (más ligero) ---
 hide_elements_css = """
     <style>
-        /* #MainMenu {visibility: hidden;} */ /* ¡Esta línea ha sido eliminada o comentada! */
+        /* Dejamos el MainMenu (hamburguesa) visible para expandir/colapsar el sidebar */
+        /* #MainMenu {visibility: hidden;} */
         footer {visibility: hidden;} /* Oculta el footer "Made with Streamlit" */
         header {visibility: hidden;} /* Oculta el encabezado de Streamlit */
+
+        /* --- ¡CAMBIO CLAVE AQUÍ! Eliminamos las reglas agresivas para stSidebar --- */
+        /* Dejamos que Streamlit maneje la visibilidad y transformación de [data-testid="stSidebar"] */
+        /*
+        [data-testid="stSidebar"] {
+            visibility: visible !important;
+            display: flex !important;
+            transform: none !important;
+            width: 210px !important;
+            max-width: 210px !important;
+        }
+        */
     </style>
 """
 st.markdown(hide_elements_css, unsafe_allow_html=True)
@@ -58,7 +71,7 @@ def display_welcome_message():
 # --- Renderizado del Contenido del Reporte Seleccionado ---
 st.markdown("---") # Separador visual
 
-# ¡CAMBIO AQUÍ! Añadimos la condición para la página de bienvenida.
+# Añadimos la condición para la página de bienvenida.
 if st.session_state.selected_report_file == "welcome_page":
     display_welcome_message() # Muestra el mensaje de bienvenida
 elif st.session_state.selected_report_file:
@@ -91,7 +104,7 @@ elif st.session_state.selected_report_file:
             st.warning(f"Asegúrate de que el archivo '{st.session_state.selected_report_file}' existe en la carpeta '{report_content_dir}/'.")
 
     except FileNotFoundError:
-        st.error(f"Error: El archivo de reporte '{st.session_report_file}' no fue encontrado en '{report_content_dir}/'.")
+        st.error(f"Error: El archivo de reporte '{st.session_state.selected_report_file}' no fue encontrado en '{report_content_dir}/'.")
         st.warning("Verifica que el nombre del archivo en 'reports_config.json' coincide con el nombre real en la carpeta 'report_content/'.")
     except Exception as e:
         st.error(f"Ocurrió un error al cargar o renderizar el reporte: {e}")
@@ -101,3 +114,4 @@ else:
     # Esto se mostrará si st.session_state.selected_report_file es None (después de "Salir")
     st.info("Por favor, selecciona un reporte para empezar.")
     st.image("https://placehold.co/800x400/cccccc/000000?text=Bienvenido", caption="Tu aplicación está lista.")
+
