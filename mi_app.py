@@ -43,7 +43,7 @@ hide_elements_css = """
 # Si el usuario NO está logueado por Streamlit Cloud, mostramos un mensaje y aplicamos CSS
 if not st.session_state.logged_in:
     st.markdown(hide_elements_css, unsafe_allow_html=True)
-    st.title("Acceso Requerido �")
+    st.title("Acceso Requerido 🔒")
     st.write("Por favor, inicia sesión con tu cuenta de Google para acceder a esta aplicación privada.")
     st.info("Esta aplicación requiere autenticación. Serás redirigido a la página de login de Streamlit Cloud.")
     # No se necesita botón de login, Streamlit Cloud lo manejará antes.
@@ -52,4 +52,3 @@ else:
     # Si el usuario ya está logueado por Streamlit Cloud,
     # lo redirigimos directamente a la primera página de reportes.
     st.switch_page("pages/Reporte_1.py") # Asegúrate que esta ruta sea correcta para tu primer reporte
-�
