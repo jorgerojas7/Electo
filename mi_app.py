@@ -25,17 +25,11 @@ st.set_page_config(
     initial_sidebar_state="collapsed" # <-- ¡CLAVE! Inicia COLAPSADO. Esto DEBERÍA forzar la hamburguesa.
 )
 
-# --- CSS para OCULTAR elementos por defecto de Streamlit (SOLO HEADER/FOOTER) ---
-# Hemos ELIMINADO CUALQUIER CSS que toque #MainMenu o [data-testid="stSidebar"]
-# para que Streamlit los maneje de forma 100% nativa.
-hide_elements_css = """
-    <style>
-        footer {visibility: hidden;} /* Oculta el footer "Made with Streamlit" */
-        header {visibility: hidden;} /* Oculta el encabezado de Streamlit */
-    </style>
-"""
-st.markdown(hide_elements_css, unsafe_allow_html=True)
-
+# --- CSS para OCULTAR elementos por defecto de Streamlit (¡AHORA NINGUNO!) ---
+# Hemos eliminado COMPLETAMENTE el bloque de CSS que contenía reglas de estilo.
+# Esto es para asegurar que NINGÚN CSS de nuestra parte interfiera con la UI de Streamlit.
+# st.markdown(""" <style>...</style> """, unsafe_allow_html=True)
+# ^^^ ESTE BLOQUE COMPLETO SE HA REMOVIDO PARA ESTA PRUEBA ^^^
 
 # --- Lógica de la Barra Lateral (Sidebar) ---
 build_collapsible_sidebar_menu() # Llama a la función que construye el menú
