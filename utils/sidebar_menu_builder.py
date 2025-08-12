@@ -8,8 +8,21 @@ def build_collapsible_sidebar_menu():
     Cuando se hace clic en un reporte, actualiza st.session_state.selected_report_file.
     """
     with st.sidebar:
-        st.header("Menú de Reportes")
-        st.markdown("---")
+        # --- Botón "Cerrar Sesión" ahora es el PRIMER elemento y funcional ---
+        st.markdown('<div id="logout-button-container">', unsafe_allow_html=True) 
+        if st.button("Cerrar Sesión 🚪", key="logout_button_final"): # Texto y emoji de puerta
+            st.session_state.logged_in = False # Restablecemos el estado a no logueado
+            st.session_state.username = ""     # Limpiamos el nombre de usuario
+            st.session_state.is_admin = False  # Limpiamos el estado de admin
+            st.session_state.selected_report_file = "home_page_marker" # Vuelve al marcador de la página de bienvenida
+            st.success("Sesión cerrada. Volviendo a la página de acceso.")
+            st.switch_page("mi_app.py") # Redirige a la página principal de login (mi_app.py)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown("---") # Separador visual
+
+        # st.header("Menú de Reportes") # Hemos eliminado este encabezado para mayor limpieza
+        # st.markdown("---") # Hemos eliminado este separador para mayor limpieza
 
         config = get_all_reports_config() # Obtener la configuración desde el JSON
 
@@ -22,8 +35,7 @@ def build_collapsible_sidebar_menu():
                 group_name = group.get("name", "Sin Grupo")
                 group_reports = group.get("reports", [])
 
-                # --- ¡CAMBIO CLAVE AQUÍ! expanded=False para que inicie colapsado ---
-                with st.expander(f"📁 {group_name}", expanded=False): 
+                with st.expander(f"📁 {group_name}", expanded=False): # Los expanders inician COLAPSADOS por defecto
                     # Ordenar reportes dentro del grupo por 'display_order'
                     sorted_group_reports = sorted(group_reports, key=lambda r: r.get("display_order", 999))
                     
@@ -40,11 +52,4 @@ def build_collapsible_sidebar_menu():
         else:
             st.warning("No se encontraron grupos de reportes en la configuración.")
 
-        st.markdown("---") # Separador al final del menú
-
-        # Botón "Salir" (simulado, ya que no hay autenticación real)
-        if st.button("Salir (Simulado)", key="exit_simulated"):
-            st.info("Saliendo de la aplicación (simulado).")
-            st.session_state.selected_report_file = None # Vuelve al estado inicial de "Selecciona un reporte"
-            st.rerun() # Para forzar la actualización de la página.
-
+        # st.markdown("---") # Hemos quitado este separador al final para mayor limpieza

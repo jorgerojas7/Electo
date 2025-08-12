@@ -1,0 +1,190 @@
+/* Archivo: styles/main.css */
+
+/* Oculta el footer y el header predeterminados de Streamlit */
+footer {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
+}
+
+/* --- Estilos de Fuente Personalizados --- */
+
+/* Título Principal (st.title / h1) */
+h1 {
+    font-size: 2.8rem;
+    color: #262730;
+    margin-bottom: 0.8rem;
+}
+
+/* Subtítulos de Nivel 1 (st.header / h2) */
+h2 {
+    font-size: 2.2rem;
+    color: #262730;
+    margin-top: 1.5rem;
+    margin-bottom: 0.7rem;
+}
+
+/* Subtítulos de Nivel 2 (st.subheader / h3) */
+h3 {
+    font-size: 1.8rem;
+    color: #262730;
+    margin-top: 1.2rem;
+    margin-bottom: 0.6rem;
+}
+
+/* Texto de Párrafo (st.write / p) */
+p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #333333;
+}
+
+/* Mensajes de Información (st.info) */
+.stAlert {
+    font-size: 1.05rem;
+    line-height: 1.5;
+}
+
+/* Mensajes de Advertencia (st.warning) */
+.stAlert.warning {
+    font-size: 1.05rem;
+    line-height: 1.5;
+}
+
+/* Pequeñas notas y leyendas (st.caption) */
+.stMarkdown span[data-testid="stText"] {
+    font-size: 0.9rem;
+    color: #666666;
+}
+
+/* Elementos en el Sidebar (ajuste si es necesario) */
+.stSidebar .stMarkdown {
+    font-size: 1.0rem;
+}
+
+.stSidebar h2 {
+    font-size: 1.4rem; /* Tamaño del título del sidebar/grupo */
+    margin-bottom: 1rem;
+}
+
+/* --- ESTILO PARA EL TEXTO DE LOS BOTONES DE REPORTE (SUBMENÚS) --- */
+/* Apunta directamente al párrafo <p> que está dentro de cualquier botón en el sidebar,
+   usando la mayor especificidad posible para sobrescribir estilos de Streamlit. */
+[data-testid="stSidebar"] button p {
+    font-size: 0.8rem !important; /* Texto de reportes: ¡PEQUEÑO Y FORZADO! */
+    margin: 0 !important;         /* Elimina márgenes extra */
+    padding: 0 !important;        /* Elimina padding extra */
+    line-height: 1 !important;    /* Controla la altura de línea para que se vea compacto */
+}
+
+/* Ajustes generales para los botones del sidebar (los de reporte se verán como links discretos) */
+.stSidebar button {
+    padding: 0.5rem 1rem;
+    width: 100%;
+    text-align: left;
+    background-color: transparent !important; /* Quitar fondo de botón por defecto */
+    color: #333333 !important; /* Color de texto más oscuro */
+    border: none !important; /* Eliminar borde del botón */
+    box-shadow: none !important; /* Eliminar sombra del botón */
+    transition: background-color 0.2s, color 0.2s; /* Transición suave para hover */
+    margin-bottom: 0.05rem !important; /* ¡Espacio reducido entre botones! */
+}
+
+.stSidebar button:hover {
+    background-color: #E0E0E0 !important; /* Fondo más claro al pasar el ratón */
+    color: #0078D4 !important; /* Color de acento de Windows 11 al pasar el ratón */
+}
+
+/* Selector para el encabezado del st.expander (el título del grupo colapsable) */
+.stSidebar .st-emotion-cache-16txt40 {
+    font-size: 1.2rem; /* Este es el tamaño del título del expander (GRUPO) */
+    font-weight: bold;
+    color: #333333;
+}
+
+/* --- ESTILO ESPECÍFICO PARA EL BOTÓN DE CERRAR SESIÓN --- */
+/* Apunta al botón completo de cerrar sesión. */
+#logout-button-container button {
+    background-color: #0078D4 !important; /* Color principal de Win11 (azul) */
+    color: #FFFFFF !important;             /* Texto blanco */
+    border: 1px solid #0078D4 !important;  /* Borde con el mismo color */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important; /* Sombra sutil */
+    border-radius: 0.5rem !important;      /* Bordes ligeramente redondeados */
+    font-weight: bold !important;          /* Texto en negrita */
+    font-size: 1.0rem !important;          /* Tamaño legible */
+    line-height: 1.5 !important;           /* Altura de línea estándar */
+    margin-top: 1rem !important;           /* Margen superior para separarlo */
+    text-align: center !important;         /* Centrar el texto en el botón */
+}
+
+/* Apunta directamente al CONTENEDOR DE TEXTO del botón de cerrar sesión. */
+/* Esto asegurará que el tamaño de la fuente dentro del botón se aplique correctamente. */
+#logout-button-container [data-testid="stMarkdownContainer"] p {
+    font-size: 1.0rem !important; /* Mismo tamaño que el botón general de logout */
+    color: #FFFFFF !important;    /* Asegura el color de texto blanco */
+    margin: 0 !important;         /* Elimina márgenes extra */
+    padding: 0 !important;        /* Elimina padding extra */
+    line-height: 1.5 !important;  /* Asegura la altura de línea */
+}
+
+#logout-button-container button:hover {
+    background-color: #005B9F !important; /* Tono más oscuro de azul al pasar el ratón */
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important; /* Sombra más pronunciada al pasar el ratón */
+}
+
+/* --- Estilos para Tablas --- */
+.dataframe {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.dataframe th,
+.dataframe td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.dataframe th {
+    background-color: #F0F2F5;
+    font-weight: bold;
+    color: #555;
+}
+
+.dataframe tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.dataframe tr:hover {
+    background-color: #e6e6e6;
+}
+
+/* --- Estilos para Gráficos --- */
+div.stPlotlyChart,
+div.stPydeckChart,
+div.stMapbox,
+div.stVegaLiteChart,
+div.stDeckGlJsonChart {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    margin-top: 1.5rem;
+    background-color: #FFFFFF;
+}
+
+/* Para imágenes (st.image) */
+img {
+    border-radius: 8px;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1rem 0;
+}

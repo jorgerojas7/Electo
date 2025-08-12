@@ -1,86 +1,92 @@
 import streamlit as st
-import pandas as pd
-import importlib.util # Para importar módulos dinámicamente
-import sys # Para añadir directorios al path de importación
-import os # Para construir rutas de archivo
+import pandas as pd # Se mantiene por si es necesario para db_ops, aunque no directamente aquí
+import importlib.util 
+import sys 
+import os 
 
-from utils.report_config_loader import init_reports_data, get_all_reports_config
-from utils.sidebar_menu_builder import build_collapsible_sidebar_menu
+# Importar funciones de la base de datos de usuarios
+from utils.db_ops import init_db, verify_user # Solamente necesitamos init_db y verify_user para el login
 
-# --- Inicialización del Archivo JSON de Reportes ---
-init_reports_data()
+# NOTA: report_config_loader y sidebar_menu_builder YA NO se importan aquí,
+# porque mi_app.py es ahora SOLO la página de login.
 
-# --- Configuración Inicial del Estado de Sesión ---
-# Define el archivo del reporte seleccionado para mostrar su contenido.
+# --- Inicialización de la Base de Datos de Usuarios ---
+init_db() # Asegura que la tabla de usuarios exista y que el admin por defecto esté creado.
+
+# --- Configuración Inicial del Estado de Sesión (para la autenticación) ---
+# Estas variables controlan el estado de autenticación del usuario.
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
+if 'username' not in st.session_state:
+    st.session_state.username = ""
+if 'is_admin' not in st.session_state:
+    st.session_state.is_admin = False
+# También inicializamos el marcador del reporte seleccionado aquí, para cuando se redirija al dashboard
 if 'selected_report_file' not in st.session_state:
-    st.session_state.selected_report_file = "welcome_page"
+    st.session_state.selected_report_file = "home_page_marker" # Marcador para la página de bienvenida
 
-
-# --- Configuración de la Página Global ---
-# Ahora mi_app.py es la única página, así que su configuración es la general.
+# --- Configuración de la Página de Login ---
 st.set_page_config(
-    page_title="App de Reportes - Perrini",
-    page_icon="📊",
-    layout="wide", # Usamos wide para el contenido principal
-    initial_sidebar_state="collapsed" # <-- ¡CLAVE! Inicia COLAPSADO. Esto DEBERÍA forzar la hamburguesa.
+    page_title="Login ELECTO - Perrini",
+    page_icon="🔒",
+    initial_sidebar_state="collapsed", # Asegura que el sidebar esté colapsado o invisible en la página de login
+    layout="centered" # Diseño centrado para el formulario de login
 )
 
-# --- CSS para OCULTAR elementos por defecto de Streamlit (¡AHORA NINGUNO!) ---
-# Hemos eliminado COMPLETAMENTE el bloque de CSS que contenía reglas de estilo.
-# Esto es para asegurar que NINGÚN CSS de nuestra parte interfiera con la UI de Streamlit.
-# st.markdown(""" <style>...</style> """, unsafe_allow_html=True)
-# ^^^ ESTE BLOQUE COMPLETO SE HA REMOVIDO PARA ESTA PRUEBA ^^^
+# --- CSS para OCULTAR COMPLETAMENTE el sidebar, footer y header en la página de login ---
+# Esto es CRUCIAL para una experiencia de login limpia y sin elementos de Streamlit.
+hide_login_ui_css = """
+    <style>
+        #MainMenu {visibility: hidden;} /* Oculta el menú de hamburguesa de Streamlit */
+        footer {visibility: hidden;} /* Oculta el footer "Made with Streamlit" */
+        header {visibility: hidden;} /* Oculta el encabezado de Streamlit */
+        
+        /* Oculta la barra lateral completa */
+        [data-testid="stSidebar"] {
+            display: none !important;
+        }
+        /* Ajusta el contenido principal para que ocupe todo el ancho en login */
+        section.main .block-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            max-width: 100%; /* Asegura que el contenido use todo el ancho en login */
+        }
+    </style>
+"""
 
-# --- Lógica de la Barra Lateral (Sidebar) ---
-build_collapsible_sidebar_menu() # Llama a la función que construye el menú
+# Aplicar el CSS solo si el usuario NO está logueado
+if not st.session_state.logged_in:
+    st.markdown(hide_login_ui_css, unsafe_allow_html=True)
 
 
-# --- Función para Mostrar el Mensaje de Bienvenida ---
-def display_welcome_message():
-    st.title("👋 ¡Bienvenido a tu App de Reportes, Perrini!")
-    st.write("Esta es tu plataforma centralizada para explorar todos tus análisis de datos.")
-    st.markdown("---")
-    st.info("Para comenzar, por favor, selecciona un reporte de la **lista en el menú lateral de la izquierda**.")
-    st.write("Puedes navegar entre diferentes grupos y reportes, y el contenido se cargará aquí mismo.")
-    st.image("https://placehold.co/800x400/80C0D0/FFFFFF?text=Selecciona+un+Reporte",
-             caption="Tu información está a solo un clic de distancia.")
+# --- Lógica de la Aplicación Streamlit (Página de Acceso) ---
 
+# Si el usuario NO está logueado, muestra el formulario de login
+if not st.session_state.logged_in:
+    # Usamos columnas para centrar el formulario de login
+    col1_login, col2_login, col3_login = st.columns([1, 2, 1])
 
-# --- Renderizado del Contenido del Reporte Seleccionado ---
-st.markdown("---")
+    with col2_login: 
+        st.title("Login ELECTO 🗳️")
+        st.write("Por favor, ingresa tus credenciales para acceder a la aplicación.")
 
-if st.session_state.selected_report_file == "welcome_page":
-    display_welcome_message()
-elif st.session_state.selected_report_file:
-    report_content_dir = "report_content" 
+        with st.form("login_form"):
+            st.subheader("Acceder")
+            username_input = st.text_input("Usuario", key="login_username_input")
+            password_input = st.text_input("Contraseña", type="password", key="login_password_input")
 
-    if report_content_dir not in sys.path:
-        sys.path.append(report_content_dir)
-
-    try:
-        module_name = st.session_state.selected_report_file.replace(".py", "")
-        spec = importlib.util.spec_from_file_location(module_name, os.path.join(report_content_dir, st.session_state.selected_report_file))
-        if spec and spec.loader:
-            report_module = importlib.util.module_from_spec(spec)
-            sys.modules[module_name] = report_module
-            spec.loader.exec_module(report_module)
-
-            if hasattr(report_module, 'render_content') and callable(report_module.render_content):
-                report_module.render_content()
-            else:
-                st.error(f"Error: El archivo {st.session_state.selected_report_file} no tiene la función 'render_content()'.")
-        else:
-            st.error(f"Error: No se pudo cargar la especificación para {st.session_state.selected_report_file}.")
-            st.warning(f"Asegúrate de que el archivo '{st.session_state.selected_report_file}' existe en la carpeta '{report_content_dir}/'.")
-
-    except FileNotFoundError:
-        st.error(f"Error: El archivo de reporte '{st.session_state.selected_report_file}' no fue encontrado en '{report_content_dir}/'.")
-        st.warning("Verifica que el nombre del archivo en 'reports_config.json' coincide con el nombre real en la carpeta 'report_content/'.")
-    except Exception as e:
-        st.error(f"Ocurrió un error al cargar o renderizar el reporte: {e}")
-        st.warning("Asegúrate de que no haya errores de sintaxis en el archivo del reporte.")
+            if st.form_submit_button("Ingresar"):
+                user_info = verify_user(username_input, password_input)
+                if user_info:
+                    st.session_state.logged_in = True
+                    st.session_state.username = user_info["username"]
+                    st.session_state.is_admin = user_info["is_admin"]
+                    # Redirige a la página principal del dashboard después del login
+                    st.success(f"¡Bienvenido, {st.session_state.username}! Redirigiendo al dashboard...")
+                    st.switch_page("pages/welcome_dashboard.py")
+                else:
+                    st.error("Usuario o contraseña incorrectos.")
 
 else:
-    st.info("Por favor, selecciona un reporte para empezar.")
-    st.image("https://placehold.co/800x400/cccccc/000000?text=Bienvenido", caption="Tu aplicación está lista.")
-
+    # Si el usuario ya está logueado, redirige directamente a la página principal del dashboard
+    st.switch_page("pages/welcome_dashboard.py")
